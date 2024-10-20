@@ -10,6 +10,7 @@ import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.ProgressBar
 import android.widget.TextView
+import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
@@ -47,8 +48,10 @@ class QuestionActivity : AppCompatActivity(), View.OnClickListener {
         val progressBar = findViewById<ProgressBar>(R.id.progress_bar)
         progressBar.max = questions.size
         progressBar.progress = questionIdx + 1
+        val progressTv = findViewById<TextView>(R.id.progress)
+        progressTv.text = "${progressBar.progress}/${progressBar.max}"
         //findViewById<TextView>(R.id.progress).text = progressBar.max
-            setOptionTvs(question)
+        setOptionTvs(question)
         //here change the submit questions
     }
 
@@ -63,6 +66,8 @@ class QuestionActivity : AppCompatActivity(), View.OnClickListener {
 
         optionLl.removeAllViews()
         optionTvs.clear()
+        val subBtn = findViewById<Button>(R.id.submitBtn)
+        subBtn.text = "Submit"
         //val optionLl = findViewById<LinearLayout>(R.id.option_ll) original line placement here
         for(option in question.options.shuffled()) {
             val optionTv = TextView(this)
@@ -94,17 +99,33 @@ class QuestionActivity : AppCompatActivity(), View.OnClickListener {
             optionTv.setBackgroundResource(R.drawable.default_option_bg)
         }
         selectedOptionTv.setBackgroundResource(R.drawable.selected_option_bg) //highlights the selected option
-        selectedOptionIdx = 0 //to set up that an option has been selected
+        selectedOptionIdx = optionTvs.indexOf(selectedOptionTv) //to set up that an option has been selected
     }
 
     private fun answerView(correctOptionTv: TextView) {
         for(optionTv in optionTvs) {
-            if(optionTv == correctOptionTv) {
-                correctOptionTv.setBackgroundResource(R.drawable.correct_option_bg)
-            }else {
-                correctOptionTv.setBackgroundResource(R.drawable.wrong_option_bg)
+            if(optionTv == correctOptionTv) { //check if current option we are at is the correct option
+                optionTv.setBackgroundResource(R.drawable.correct_option_bg)
+            }else if(optionTvs.indexOf(optionTv) == selectedOptionIdx) { //check if selected option was wrong
+                optionTv.setBackgroundResource(R.drawable.wrong_option_bg)
+            }else { //if else, then it is default
+                optionTv.setBackgroundResource(R.drawable.default_option_bg)
             }
         }
+        //change the text of the submit button when viewing answers
+        val subBtn = findViewById<Button>(R.id.submitBtn)
+        subBtn.text = "Go to next question"
+        //go here to maybe change the text for last question?
+    }
+
+    //function to help obtain the correct option
+    private fun getCorrectOption(question: Question): TextView? {
+        for(optionTv in optionTvs) {
+            if(optionTv.text == question.correctAnswer) {
+                return optionTv
+            }
+        }
+        return null // return null if correct option is not found but this should never happen
     }
 
     private fun goToResult() {
@@ -117,17 +138,20 @@ class QuestionActivity : AppCompatActivity(), View.OnClickListener {
     override fun onClick(view: View?) { // to trigger once something is clicked
         if(view == findViewById<Button>(R.id.submitBtn)) { // if submit is clicked
             if(!answerRevealed) {
-                if(selectedOptionIdx == -1) { //to check if the user made a selection
-                    // make a toast if they have not selected an option
-                    //if option is selected change the variable i think do this in the else statement
+                if(selectedOptionIdx == -1) { //to check if the user did not make a selection, produce a toast
+                    Toast.makeText(this, "Please make a Selection.",Toast.LENGTH_SHORT).show()
                 } else {
-                    // go to phase two and call
-                   //answerView()
+                    // go to phase two and call answerView()
+                    val correctOptionTv = getCorrectOption(questions[questionIdx])
+                    if(correctOptionTv != null) {
+                        answerView(correctOptionTv)
+                    }
+                    answerRevealed = true
                 }
             } else { //if answer is revealed, move on to the next question
                 questionIdx++
                 setQuestion() // to go back to phase 1
-                // or go to last page goToResult()
+                //check if at last question then go toresult
             }
         } else { // if an option is clicked
             //checking which option is clicked from the choices

@@ -3,6 +3,7 @@ package edu.tcu.mlcoronilla.quiz
 import android.content.Intent
 import android.os.Bundle
 import android.view.inputmethod.EditorInfo
+import android.widget.Button
 import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
@@ -28,10 +29,19 @@ class MainActivity : AppCompatActivity() {
                 true
             } else false
         }
+
+        //to go question if start button if clicked
+        val startButton = findViewById<Button>(R.id.button)
+        startButton.setOnClickListener{goToQuestion(nameEt)}
     }
     private fun goToQuestion(nameEt: TextInputEditText) {
-        //have to not let it go to next phase with this toast
-        Toast.makeText(this, "Please Enter Your Name.",Toast.LENGTH_SHORT).show()
+        val name = nameEt.text.toString()
+
+        //check if a name has not been entered
+        if(name == ""){
+            Toast.makeText(this, "Please Enter Your Name.",Toast.LENGTH_SHORT).show()
+            return
+        }
 
         val intent = Intent(this, QuestionActivity::class.java)
         intent.putExtra("username", nameEt.text.toString())
@@ -39,4 +49,3 @@ class MainActivity : AppCompatActivity() {
         finish()
     }
 }
-//two ways to move forward into the quiz is to press the arrow button from the keyboard or the start button
