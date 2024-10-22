@@ -44,7 +44,7 @@ class MainActivity : AppCompatActivity() {
         }
 
         val intent = Intent(this, QuestionActivity::class.java)
-        intent.putExtra("username", nameEt.text.toString())
+        intent.putExtra("username", name)
         startActivity(intent)
         finish()
     }

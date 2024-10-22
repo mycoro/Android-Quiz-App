@@ -24,6 +24,7 @@ class QuestionActivity : AppCompatActivity(), View.OnClickListener {
     private var selectedOptionIdx = -1
     private val optionTvs = mutableListOf<TextView>()
     private var answerRevealed = false
+    private var score = 0
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
@@ -37,6 +38,7 @@ class QuestionActivity : AppCompatActivity(), View.OnClickListener {
         findViewById<Button>(R.id.submitBtn).setOnClickListener(this)
         setQuestion()
     }
+
     private fun setQuestion() { //to set the question format on the screen
         //setting up flags here
         selectedOptionIdx = -1
@@ -49,10 +51,16 @@ class QuestionActivity : AppCompatActivity(), View.OnClickListener {
         progressBar.max = questions.size
         progressBar.progress = questionIdx + 1
         val progressTv = findViewById<TextView>(R.id.progress)
-        progressTv.text = "${progressBar.progress}/${progressBar.max}"
+        progressTv.text = buildString {
+        append(progressBar.progress)
+        append("/")
+        append(progressBar.max)
+    }
         //findViewById<TextView>(R.id.progress).text = progressBar.max
         setOptionTvs(question)
         //here change the submit questions
+        val subBtn = findViewById<Button>(R.id.submitBtn)
+        subBtn.text = getString(R.string.submit_btn)
     }
 
     //responsible for conversion from dp to px to be able to set up layout
@@ -67,7 +75,7 @@ class QuestionActivity : AppCompatActivity(), View.OnClickListener {
         optionLl.removeAllViews()
         optionTvs.clear()
         val subBtn = findViewById<Button>(R.id.submitBtn)
-        subBtn.text = "Submit"
+        subBtn.text = getString(R.string.submit_btn)
         //val optionLl = findViewById<LinearLayout>(R.id.option_ll) original line placement here
         for(option in question.options.shuffled()) {
             val optionTv = TextView(this)
@@ -106,6 +114,7 @@ class QuestionActivity : AppCompatActivity(), View.OnClickListener {
         for(optionTv in optionTvs) {
             if(optionTv == correctOptionTv) { //check if current option we are at is the correct option
                 optionTv.setBackgroundResource(R.drawable.correct_option_bg)
+                score++
             }else if(optionTvs.indexOf(optionTv) == selectedOptionIdx) { //check if selected option was wrong
                 optionTv.setBackgroundResource(R.drawable.wrong_option_bg)
             }else { //if else, then it is default
@@ -114,8 +123,7 @@ class QuestionActivity : AppCompatActivity(), View.OnClickListener {
         }
         //change the text of the submit button when viewing answers
         val subBtn = findViewById<Button>(R.id.submitBtn)
-        subBtn.text = "Go to next question"
-        //go here to maybe change the text for last question?
+        subBtn.text = getString(R.string.go_to)
     }
 
     //function to help obtain the correct option
@@ -129,8 +137,14 @@ class QuestionActivity : AppCompatActivity(), View.OnClickListener {
     }
 
     private fun goToResult() {
+        val subBtn = findViewById<Button>(R.id.submitBtn)
+        subBtn.text = getString(R.string.finish)
+
         val intent = Intent(this, ResultActivity::class.java)
-        //intent.putExtra("score",)what to put here
+        intent.putExtra("score", score)
+        intent.putExtra("totalQuestions", questions.size)
+        val username = intent.getStringExtra("username")
+        intent.putExtra("username", username)
         startActivity(intent)
         finish()
     }
@@ -150,8 +164,11 @@ class QuestionActivity : AppCompatActivity(), View.OnClickListener {
                 }
             } else { //if answer is revealed, move on to the next question
                 questionIdx++
-                setQuestion() // to go back to phase 1
-                //check if at last question then go toresult
+                if(questionIdx < questions.size){// to go back to phase 1
+                    setQuestion()
+                }else{ //check if at last question then go to result
+                    goToResult()
+                }
             }
         } else { // if an option is clicked
             //checking which option is clicked from the choices

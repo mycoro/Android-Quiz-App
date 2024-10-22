@@ -78,7 +78,6 @@
             android:layout_width="300dp"
             android:layout_height="match_parent"
             android:layout_gravity="center_horizontal"
-            android:text="@string/submit_btn"
             android:textSize="16sp"
             android:backgroundTint="@color/tcu_purple"
             android:paddingTop="10dp"

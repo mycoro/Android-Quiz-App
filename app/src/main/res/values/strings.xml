@@ -8,9 +8,11 @@
     <string name="question_tv">What country does this flag belong to?</string>
     <string name="submit_btn">Submit</string>
     <string name="description">A flag.</string>
-    <string name="result"></string>
+    <string name="result">Result</string>
     <string name ="result_image"></string>
     <string name="good_result_message"></string>
     <string name="result_score"></string>
-    <string name ="try_again_btn"></string>
+    <string name ="try_again_btn">Try again</string>
+    <string name="finish">Finish</string>
+    <string name ="go_to">Go to next Question</string>
 </resources>
