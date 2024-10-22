@@ -114,26 +114,16 @@ class QuestionActivity : AppCompatActivity(), View.OnClickListener {
         for(optionTv in optionTvs) {
             if(optionTv == correctOptionTv) { //check if current option we are at is the correct option
                 optionTv.setBackgroundResource(R.drawable.correct_option_bg)
-                score++
             }else if(optionTvs.indexOf(optionTv) == selectedOptionIdx) { //check if selected option was wrong
                 optionTv.setBackgroundResource(R.drawable.wrong_option_bg)
             }else { //if else, then it is default
                 optionTv.setBackgroundResource(R.drawable.default_option_bg)
             }
+            optionTv.isEnabled = false
         }
         //change the text of the submit button when viewing answers
         val subBtn = findViewById<Button>(R.id.submitBtn)
         subBtn.text = getString(R.string.go_to)
-    }
-
-    //function to help obtain the correct option
-    private fun getCorrectOption(question: Question): TextView? {
-        for(optionTv in optionTvs) {
-            if(optionTv.text == question.correctAnswer) {
-                return optionTv
-            }
-        }
-        return null // return null if correct option is not found but this should never happen
     }
 
     private fun goToResult() {
@@ -143,8 +133,8 @@ class QuestionActivity : AppCompatActivity(), View.OnClickListener {
         val intent = Intent(this, ResultActivity::class.java)
         intent.putExtra("score", score)
         intent.putExtra("totalQuestions", questions.size)
-        val username = intent.getStringExtra("username")
-        intent.putExtra("username", username)
+        val username = this.intent.getStringExtra("username")
+        intent.putExtra("name", username)
         startActivity(intent)
         finish()
     }
@@ -156,11 +146,19 @@ class QuestionActivity : AppCompatActivity(), View.OnClickListener {
                     Toast.makeText(this, "Please make a Selection.",Toast.LENGTH_SHORT).show()
                 } else {
                     // go to phase two and call answerView()
-                    val correctOptionTv = getCorrectOption(questions[questionIdx])
-                    if(correctOptionTv != null) {
+                    val question = questions[questionIdx]
+                    val selectedOption = optionTvs[selectedOptionIdx].text.toString()
+
+                    if (selectedOption == question.correctAnswer) {
+                        score++ //increment score if the answer is correct
+                    }
+
+                    //go to answer view to show the correct answer
+                    val correctOptionTv = optionTvs.find { it.text == question.correctAnswer }
+                    if (correctOptionTv != null) {
                         answerView(correctOptionTv)
                     }
-                    answerRevealed = true
+                    answerRevealed = true //change flag
                 }
             } else { //if answer is revealed, move on to the next question
                 questionIdx++

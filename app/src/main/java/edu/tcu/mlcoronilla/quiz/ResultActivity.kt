@@ -2,7 +2,6 @@ package edu.tcu.mlcoronilla.quiz
 
 import android.content.Intent
 import android.os.Bundle
-import android.view.View
 import android.widget.Button
 import android.widget.ImageView
 import android.widget.TextView
@@ -12,9 +11,6 @@ import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 
 class ResultActivity : AppCompatActivity(){
-    private val score = intent.getIntExtra("score", 0)
-    private val username = intent.getStringExtra("username")
-    private val totalQuestions = intent.getIntExtra("totalQuestions", 10)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -30,13 +26,25 @@ class ResultActivity : AppCompatActivity(){
         setResult()
     }
     private fun setResult() {
-        findViewById<TextView>(R.id.result_score_tv).text = "Your score is $score/$totalQuestions"
+        //get the information passed from other kt files
+        val username = intent.getStringExtra("name")
+        val score = intent.getIntExtra("score", 0)
+        val totalQuestions = intent.getIntExtra("totalQuestions", 10)
+
+        findViewById<TextView>(R.id.result_score_tv).text = buildString {
+        append("Your score is ")
+        append(score)
+        append("/")
+        append(totalQuestions)
+        append(".")
+    }
+        //to set up the emoji image based on the score received
         if(score < 6){
-            findViewById<ImageView>(R.id.image).setImageResource(R.drawable.ic_sweat_face)
-            findViewById<TextView>(R.id.result_message_tv).text = "Good luck next time, $username!"
+            findViewById<ImageView>(R.id.result_iv).setImageResource(R.drawable.ic_sweat_face)
+            "Good luck next time, $username!".also { findViewById<TextView>(R.id.result_message_tv).text = it }
         } else {
-            findViewById<ImageView>(R.id.image).setImageResource(R.drawable.ic_trophy)
-            findViewById<TextView>(R.id.result_message_tv).text = "Congratulations, $username!"
+            findViewById<ImageView>(R.id.result_iv).setImageResource(R.drawable.ic_trophy)
+            "Congratulations, $username!".also { findViewById<TextView>(R.id.result_message_tv).text = it }
         }
     }
 
